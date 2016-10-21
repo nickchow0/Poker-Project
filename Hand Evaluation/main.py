@@ -1,8 +1,9 @@
 from holdem import Poker
+import player
 import sys, random
 
 debug = False    #Set to True to see the debug statements
-number_of_players = 4
+number_of_players = 2
 
 
 poker = Poker(number_of_players, debug)
@@ -12,7 +13,6 @@ if not poker:
 print "1. Shuffling"
 poker.shuffle()
 
-   
 print "2. Cutting"
 if not poker.cut( random.randint(1,51) ):
     #Cannot cut 0, or the number of cards in the deck
@@ -23,16 +23,16 @@ players_hands = poker.distribute()
 if not players_hands:
     sys.exit("*** ERROR ***: Insufficient cards to distribute.")
 
-
 print "4. Hands"
 print "-----------------------"
 for hand in players_hands:
     text = "Player - "
     for card in hand:
+
+        player1 = player(0, )
         text += str(card) + "  "
     print text
 print "-----------------------"
-
 
 #Gets and prints the community cards
 print "5. Community Cards"
