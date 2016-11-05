@@ -1,7 +1,7 @@
 from scoring import Scoring
 from holdem import Poker
-#import player
 import sys, random
+from player import player
 
 debug = False    #Set to True to see the debug statements
 number_of_players = 2
@@ -23,8 +23,13 @@ if not poker.cut( random.randint(1,51) ):
 print "3. Distributing"
 players_hands = poker.distribute()
 
-player1 = player(0, players_hands[0], poker, 1) # self, personality, own_cards, poker, dealer = 1
-player2 = player(0, players_hands[1], poker) # self, personality, own_cards, poker, dealer = 0
+# result = []
+# for i, hand in enumerate(players_hands):
+#     for card in hand:
+#         result.append(card)
+#     print text
+player1 = player(0, players_hands[0], 100, dealer = 1) # self, personality, own_cards, poker, blind, dealer = 0
+player2 = player(0, players_hands[1], 100) # self, personality, own_cards, poker, dealer = 0
 
 if not players_hands:
     sys.exit("*** ERROR ***: Insufficient cards to distribute.")
@@ -34,11 +39,6 @@ print "-----------------------"
 for i, hand in enumerate(players_hands):
     text = "Player %d - " % (i+1)
     for card in hand:
-<<<<<<< HEAD
-=======
-
-        #player1 = player(0, )
->>>>>>> 24a00174fb469c0ca4ec782b5db666a9612136e9
         text += str(card) + "  "
     print text
 print "-----------------------"

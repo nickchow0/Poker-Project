@@ -49,7 +49,6 @@ class deck:
     def __init__(self):
         self.cards = []
         self.inplay = []
-        self.addJokers = addJokers
         for symbol in range(0,4):
             for value in range (2,15):
                 self.cards.append( Card(symbol, value) )
