@@ -46,19 +46,13 @@ class Card:
 class deck:
     
     #Initializes the deck, and adds jokers if specified
-    def __init__(self, addJokers = False):
+    def __init__(self):
         self.cards = []
         self.inplay = []
         self.addJokers = addJokers
         for symbol in range(0,4):
             for value in range (2,15):
                 self.cards.append( Card(symbol, value) )
-        if addJokers:
-            self.total_cards = 54
-            self.cards.append( Card(-1, -1) )
-            self.cards.append( Card(-1, -1) )
-        else:
-            self.total_cards = 52
 
     #Shuffles the deck
     def shuffle(self):

@@ -20,6 +20,10 @@ if not poker.cut( random.randint(1,51) ):
 
 print "3. Distributing"
 players_hands = poker.distribute()
+
+player1 = player(0, players_hands[0], poker, 1) # self, personality, own_cards, poker, dealer = 1
+player2 = player(0, players_hands[1], poker) # self, personality, own_cards, poker, dealer = 0
+
 if not players_hands:
     sys.exit("*** ERROR ***: Insufficient cards to distribute.")
 
@@ -28,8 +32,6 @@ print "-----------------------"
 for hand in players_hands:
     text = "Player - "
     for card in hand:
-
-        player1 = player(0, )
         text += str(card) + "  "
     print text
 print "-----------------------"
