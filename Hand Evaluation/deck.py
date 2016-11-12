@@ -29,9 +29,6 @@ class Card:
             text = str(self.value)
         
         
-        
-        
-        
         if self.symbol == 0:    #D-Diamonds
             text += "D" 
         elif self.symbol == 1:  #H-Hearts
@@ -41,8 +38,15 @@ class Card:
         else:   #C-Clubs
             text += "C" 
             
-        return text    
-    
+        return text   
+
+    def getSymbol(self):
+        return self.symbol
+
+    def getValue(self):
+        retrun self.value
+
+
 class deck:
     
     #Initializes the deck, and adds jokers if specified
