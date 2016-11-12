@@ -39,6 +39,9 @@ print "-----------------------"
 for i, hand in enumerate(players_hands):
     text = "Player %d - " % (i+1)
     for card in hand:
+        #removing cards from deck:
+        i = card.getSymbol()*14 + card.getValue()
+        score.removeCardFromDeck(i)
         text += str(card) + "  "
     print text
 print "-----------------------"
