@@ -30,6 +30,7 @@ players_hands = poker.distribute()
 #     print text
 player1 = player(0, players_hands[0], 100, dealer = 1) # self, personality, own_cards, poker, blind, dealer = 0
 player2 = player(0, players_hands[1], 100) # self, personality, own_cards, poker, dealer = 0
+score.setStage(0)
 
 if not players_hands:
     sys.exit("*** ERROR ***: Insufficient cards to distribute.")
@@ -75,6 +76,7 @@ def bet(i, round):
 bet(0, 0)
 
 #Flop
+score.setStage(1)
 if score.allStillIn():
     print "5a - Flop"
     print "-----------------------"
@@ -87,6 +89,7 @@ if score.allStillIn():
     bet(1,1)
 
 #Turn
+score.setStage(2)
 if score.allStillIn():
     print "5b - Turn"
     print "-----------------------"
@@ -98,6 +101,7 @@ if score.allStillIn():
     bet(0,2)
 
 #River
+score.setStage(3)
 if score.allStillIn():
     print "5c - River"
     print "-----------------------"
@@ -108,8 +112,10 @@ if score.allStillIn():
     display_community_cards(community_cards)
     bet(1,3)
 
+score.setStage(4)
 if score.allStillIn():
     print "6. Determining Score"
+    score.setStage(4)
     try:
         results = poker.determine_score(community_cards, players_hands)
     except:
