@@ -1,4 +1,5 @@
 from holdem import Poker
+from deck import Card
 import sys, random, copy
 
 class Scoring:
@@ -31,6 +32,15 @@ class Scoring:
      #   self.decisionsRequired = 2
 
 #   Gives all the possible choices of n cards from the current deck        
+    def add_player_cards(self, int):
+        self.playerCards.append(int)
+
+    def add_opp_cards(self, int):
+        self.oppCards.append(int)
+
+    def add_community_cards(self, int):
+        self.communityCards.append(int)
+
     def giveAllPossibilities(self, n):        
         allChoices = []       
         def helper(self, n):
@@ -217,7 +227,25 @@ class Scoring:
                  
         if action == 6: # showDown         
             if self.stage == self.gamelength:
-                pass #go to showdown
+                #convert back to cards
+                community_cards = []
+                player_cards = []
+                opp_cards = []
+
+                for integer in community_cards:
+                    community_cards.append(Card(integer/14, integer%14))
+                for integer in player_cards:
+                    player_cards.append(Card(integer/14, integer%14))
+                for integer in opp_cards:
+                    opp_cards.append(Card(integer/14, integer%14))
+
+                results = poker.determine_score(community_cards, [player_cards, opp_cards])
+                winner = poker.determine_winner(results)
+
+                if winner == 0:
+                    self.isWin = 1
+                else:
+                    self.isWin = -1
             else:
                 raise Exception("ShowDown has been called too early")
         

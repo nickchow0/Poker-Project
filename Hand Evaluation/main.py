@@ -8,6 +8,9 @@ number_of_players = 2
 bigblind = 2
 gameNumber = 0
 
+player1 = player(0, [None, None], bigblind)
+player2 = player(0, [None, None], bigblind)
+
 while(True):
     gameNumber += 1
     print "Game %d" %gameNumber
@@ -49,8 +52,12 @@ while(True):
         text = "Player %d - " % (i+1)
         for card in hand:
             #removing cards from deck:
-            i = card.getSymbol()*14 + card.getValue()
-            score.removeCardFromDeck(i)
+            j = card.getSymbol()*14 + card.getValue()
+            score.removeCardFromDeck(j)
+            if i == 0:
+                score.add_player_cards(j)
+            else:
+                score.add_opp_cards(j)
             text += str(card) + "  "
         print text
     print "-----------------------"
@@ -113,10 +120,14 @@ while(True):
         print "5a - Flop"
         print "-----------------------"
         card = poker.getFlop()
-        #print poker.getFlop()
         if not card:
             sys.exit("*** ERROR ***: Insufficient cards to distribute.")
         community_cards = card
+        print community_cards
+        for indiv_card in community_cards:
+            j = indiv_card.getSymbol()*14 + indiv_card.getValue()
+            score.removeCardFromDeck(j)
+            score.add_community_cards(j)
         display_community_cards(community_cards)
         if player1.is_dealer():
             bet(0,1)
@@ -129,6 +140,9 @@ while(True):
         print "5b - Turn"
         print "-----------------------"
         card = poker.getOne()
+        j = card[0].getSymbol()*14 + card[0].getValue()
+        score.removeCardFromDeck(j)
+        score.add_community_cards(j)
         if not card:
             sys.exit("*** ERROR ***: Insufficient cards to distribute.")
         community_cards.extend( card )
@@ -144,6 +158,9 @@ while(True):
         print "5c - River"
         print "-----------------------"
         card = poker.getOne()
+        j = card[0].getSymbol()*14 + card[0].getValue()
+        score.removeCardFromDeck(j)
+        score.add_community_cards(j)
         if not card:
             sys.exit("*** ERROR ***: Insufficient cards to distribute.")
         community_cards.extend( card ) 
@@ -164,6 +181,8 @@ while(True):
         print "7. Determining Winner"  
         try:
             winner = poker.determine_winner(results)
+            print '123'
+            print winner
         except:
             sys.exit("*** ERROR ***: Problem determining the winner.")
 
