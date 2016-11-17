@@ -17,11 +17,11 @@ class Scoring:
         
         self.stage = 0 # 0=preflop, 1=flop, 2=turn, 3= river, 4=end
         
-        self.firstPlayer = random.randint(0,1) 
+        self.firstPlayer = 0 
         self.playerTurn = self.firstPlayer
         
         self.isWin = 0 # can be 1:win, 0:not ended, -1 : lost		
-        self.actions = range(6) # 0=1/2 bet, 1=full bet, 2=fold, 3=check, 4=raise, 5=showdown
+        self.actions = range(7) # 0=1/2 bet, 1=full bet, 2=fold, 3=check, 4= call, 5=raise, 6=showdown
         self.maxLastBet = 0        
         
         self.communityCards = []
@@ -32,6 +32,9 @@ class Scoring:
      #   self.decisionsRequired = 2
 
 #   Gives all the possible choices of n cards from the current deck        
+    def set_firstPlayer(self, int):
+    	self.firstPlayer = int
+
     def add_player_cards(self, int):
         self.playerCards.append(int)
 

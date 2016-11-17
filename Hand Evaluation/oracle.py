@@ -20,7 +20,7 @@ class oraclePlayer:
         return 0
         
     # receives a gameState. Based on the gameState, it returns an action.
-    # action is a subset of {fold, place half bet, place full bet, check, raise [be a full bet], showdown}
+    # action is a subset of # 0=1/2 bet, 1=full bet, 2=fold, 3=check, 4= call, 5=raise, 6=showdown
     def bet(self, gameState):
         actions = gameState.getLegalMoves(gameState)
         #if len(actions) == 1:

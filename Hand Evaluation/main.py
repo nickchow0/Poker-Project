@@ -2,6 +2,7 @@ from scoring import Scoring
 from holdem import Poker
 import sys, random
 from player import player
+from oracle import oraclePlayer
 
 debug = False    #Set to True to see the debug statements
 number_of_players = 2
@@ -10,6 +11,7 @@ gameNumber = 0
 
 player1 = player(0, [None, None], bigblind)
 player2 = player(0, [None, None], bigblind)
+oracle = oraclePlayer(1000, None)
 
 while(True):
     gameNumber += 1
@@ -23,8 +25,9 @@ while(True):
         player2.set_dealer()
         player1.remove_dealer()
 
-
     score = Scoring()
+
+    score.set_firstPlayer(gameNumber%2-1)
 
     poker = Poker(number_of_players, debug)
     if not poker:
@@ -71,21 +74,81 @@ while(True):
         print "-----------------------"
 
     #i is player number - either 0 or 1
-    def bet(i, round):        
-        amount = input("Player %d: Amount to Bet (0 to Check): " % (i+1)) 
-        while type(amount) != int:
-            amount = input("Amount to Bet (0 to Check): ")
-        score.makeBet(amount, i, round)
-        j = (i+1)%2
-        valid_responses = ["C", "F"]
-        response = raw_input("Player %d: Call(C) or Fold(F): " % (j+1))
-        while response not in valid_responses:
-            response = raw_input("Player %d: Call(C) or Fold(F): " % (j+1))
-        if response == "C":
-            score.makeBet(amount, j, round)
+    def bet(i, round):
+        if i == 0:
+            action = oracle.bet(score) # 0=1/2 bet, 1=full bet, 2=fold, 3=check, 4= call, 5=raise, 6=showdown
+            if action == 0:
+                bet = bigblind/2
+            elif action == 1:
+                bet = bigblind
+            elif action == 2:
+                bet = "F"
+            elif action == 3:
+                bet = 0
+            elif action == 4:
+                bet = "C"
+            elif action == 5:
+                bet = 10
+            elif action == 6:
+                sys.exit("Error")
+            amount = bet
+            print "Player 1: Bet %d" %amount
+            score.makeBet(amount, i, round)
+            valid_responses = ["C", "F"]
+            response = raw_input("Player 2: Call(C) or Fold(F): ")
+            while response not in valid_responses:
+                response = raw_input("Player %d: Call(C) or Fold(F): " % (j+1))
+            if response == "C":
+                score.makeBet(amount, j, round)
+            else:
+                score.fold(j)
+            print "Total bet so far is %d" % score.get_totalBet()
         else:
-            score.fold(j)
-        print "Total bet so far is %d" % score.get_totalBet()
+            amount = input("Player %d: Amount to Bet (0 to Check): " % (i+1)) 
+            while type(amount) != int:
+                amount = input("Amount to Bet (0 to Check): ")
+            score.makeBet(amount, i, round)
+            action = oracle.bet(score) # 0=1/2 bet, 1=full bet, 2=fold, 3=check, 4= call, 5=raise, 6=showdown
+            if action == 0:
+                bet = bigblind/2
+            elif action == 1:
+                bet = bigblind
+            elif action == 2:
+                bet = "F"
+            elif action == 3:
+                bet = 0
+            elif action == 4:
+                bet = "C"
+            elif action == 5:
+                bet = 10
+            elif action == 6:
+                sys.exit("Error")
+            print bet
+            if bet == "C":
+                score.makeBet(amount, j, round)
+            else:
+                score.fold(j)
+            print "Total bet so far is %d" % score.get_totalBet()
+
+
+
+
+
+
+        # amount = input("Player %d: Amount to Bet (0 to Check): " % (i+1)) 
+        # while type(amount) != int:
+        #     amount = input("Amount to Bet (0 to Check): ")
+        # score.makeBet(amount, i, round)
+        # j = (i+1)%2
+        # valid_responses = ["C", "F"]
+        # response = raw_input("Player %d: Call(C) or Fold(F): " % (j+1))
+        # while response not in valid_responses:
+        #     response = raw_input("Player %d: Call(C) or Fold(F): " % (j+1))
+        # if response == "C":
+        #     score.makeBet(amount, j, round)
+        # else:
+        #     score.fold(j)
+        # print "Total bet so far is %d" % score.get_totalBet()
 
     def modified_bet(i):
         j = (i+1)%2
