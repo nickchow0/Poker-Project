@@ -44,7 +44,7 @@ class Card:
         return self.symbol
 
     def getValue(self):
-        retrun self.value
+        return self.value
 
 
 class deck:

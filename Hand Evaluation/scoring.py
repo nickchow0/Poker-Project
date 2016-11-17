@@ -113,7 +113,11 @@ class Scoring:
     def totalBetForPlayer(self, i):
 		return sum(self.bets[i])
 
+    def setStage(self, newStage):
+        self.stage = newStage
 
+    def getStage(self):
+        return self.stage
 # Things that this function should do:
 # Appropriately increase game stage
 # return a list of possible successor states
