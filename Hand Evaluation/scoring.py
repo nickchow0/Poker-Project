@@ -118,6 +118,7 @@ class Scoring:
 
     def getStage(self):
         return self.stage
+        
 # Things that this function should do:
 # Appropriately increase game stage
 # return a list of possible successor states
@@ -203,7 +204,7 @@ class Scoring:
                 allStates.append(cp)
             return allStates                                
 
-        if action == 5: #Raise or Bet
+        if action == 5: # Raise or Bet
             allStates = []
             if self.numberOfRaisesAllowed == 0:
                 raise Exception("Can't Raise Anymore")

@@ -11,23 +11,10 @@ def avg(L):
     
 class oraclePlayer:
     #role \in \{small blind, big blind\}
-    def __init__(self, role, cash, bets):
-        self.role = role                
+    def __init__(self, cash, bets):        
         self.cash = cash     
         self.depth = 1000 #for now
-    
-    def getLegalAction(self, gameState):
-        if gameState.gameStage == 0:
-            if self.role == "small blind":
-                return ["place half bet"]
-            if self.role == "big blind":
-                return ["place full bet"]
-        if gameState.gameStage > 0 and gameState.gameStage < gameState.length:
-            return ["check", "fold", "raise"]
-        if gameState.gameStage == gameState.length:
-            return ["showdown"]
-        raise Exception("Not a valid State")
-    
+        
     # We can either use a NN or a rule that makes sense
     def evaluationFunction(state):
         return 0
@@ -35,31 +22,50 @@ class oraclePlayer:
     # receives a gameState. Based on the gameState, it returns an action.
     # action is a subset of {fold, place half bet, place full bet, check, raise [be a full bet], showdown}
     def bet(self, gameState):
-        actions = self.getLegalAction(gameState)
-        if len(actions) == 1:
-            return actions[0]
+        actions = gameState.getLegalMoves(gameState)
+        #if len(actions) == 1:
+        #    return actions[0]
+        if len(actions) == 0:
+            raise Exception("No Actions Available")
 
         def v(state, playerIndex, depth):
-            if state.isWin() or state.isLose():
-                return state.getScore()
+            if state.isWin == 1 or state.isWin == -1:
+                return state.get_score()
+            
             if depth == 0:
                 return self.evaluationFunction(state)
+            currStage = state.getStage();            
+            
             if playerIndex == 0:
-                legalActions = self.getLegalAction(gameState)
+                legalActions = state.getLegalMoves(playerIndex)
                 rewardList = []
                 for action in legalActions:
-                    possibleStates = state.generateSuccessor(0, action)
-                    possibleRewards = [v(s, 1, depth) for s in possibleStates]
+                    possibleStates = state.get_possible_successors(action, 0)
+                    possibleRewards = []
+                    for s in possibleStates:
+                        newStage = s.getStage()
+                        diff = newStage - currStage
+                        reward = v(s, s.playerTurn, depth - diff) 
+                        possibleRewards.append(reward)
                     rewardList.append(avg(possibleRewards))
                 #stateList = [state.generateSuccessor(0, action) for action in legalActions]
                 #rewardList = [v(s, 1, depth) for s in stateList]
                 return max(rewardList)
+            
             if playerIndex == 1:
-                legalActions = state.getLegalActions(playerIndex)
+                legalActions = state.getLegalMoves(playerIndex)
+                rewardList = []
                 for action in legalActions:
-                    possibleStates = state.generateSuccessor(1, action)
-                    possibleRewards = [v(s, 0, depth - 1) for s in possibleStates]
+                    possibleStates = state.get_possible_successors(action, 1)
+                    possibleRewards = []
+                    for s in possibleStates:
+                        newStage = s.getStage()
+                        diff = newStage - currStage
+                        reward = v(s, s.playerTurn, depth - diff) 
+                        possibleRewards.append(reward)
                     rewardList.append(avg(possibleRewards))
+                    #possibleRewards = [v(s, 0, depth - 1) for s in possibleStates]
+                    #rewardList.append(avg(possibleRewards))
                 #stateList = [state.generateSuccessor(playerIndex, action) for action in legalActions]
                 #rewardList = [v(s, 0, depth - 1) for s in stateList]
                 return min(rewardList)                        
