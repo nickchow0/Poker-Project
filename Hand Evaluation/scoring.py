@@ -4,21 +4,32 @@ import sys, random, copy
 class Scoring:
     def __init__(self):
         self.totalBet = 0
-        self.bets = [[0,0,0,0],[0,0,0,0]] 
+        self.bets = [[0,0,0,0],[0,0,0,0]]  # We can add this later        
             #card index = card symbol number * 14 + card number 
             #card symbols = [D,H,S,C]
         self.cardsLeftInDeck = range(2,15)+range(16,29)+range(30,43)+range(44,57)
             # Bet Formats [half Bet, Full Bet, Minimum Bet Raise] 
         self.betFormat = [2, 5, 5] 	# in principle this should be supplied
+        
         self.folded = [0,0]
         self.gamelength = 4 
+        
         self.stage = 0 # 0=preflop, 1=flop, 2=turn, 3= river, 4=end
+        
         self.firstPlayer = random.randint(0,1) 
         self.playerTurn = self.firstPlayer
+        
         self.isWin = 0 # can be 1:win, 0:not ended, -1 : lost		
         self.actions = range(6) # 0=1/2 bet, 1=full bet, 2=fold, 3=check, 4=raise, 5=showdown
-        self.maxLastBet = 0
-    
+        self.maxLastBet = 0        
+        
+        self.communityCards = []
+        self.playerCards = []
+        self.oppCards = []
+        
+        self.numberOfRaisesAllowed = 1
+     #   self.decisionsRequired = 2
+
 #   Gives all the possible choices of n cards from the current deck        
     def giveAllPossibilities(self, n):        
         allChoices = []       
@@ -43,15 +54,34 @@ class Scoring:
         
         helper(n)
         return allChoices
-        
-    def advanceStage(self):        
-        if self.playerTurn != self.firstPlayer:    
+    
+    # This function advances the stage / changes the turn appropraitely    
+    def advanceStage(self, n):        
+        if n == 0: # Next stage
             self.stage += 1 #for now we only have one round of betting
             self.maxLastBet = 0
-        if self.playerTurn == 0:
-            self.playerTurn = 1
+            self.playerTurn = self.firstPlayer
+            self.numberOfRaisesAllowed = 2
+        if n == 1: #advance turn
+            if self.playerTurn == 0:
+                self.playerTurn = 1
+            else:
+                self.playerTurn = 0        
+                
+    def getLegalMoves(self, playerInd):
+        if self.stage == 4:
+            return [6]
+        if self.stage == 0 and self.maxLastBet == 0:
+            if self.firstPlayer == playerInd:
+                return [0]
+            else:
+                return [1]
+        if self.maxLastBet == 0:
+            return [2, 3, 5]
+        if self.numberOfRaisesAllowed > 0:
+            return [2, 4, 5]
         else:
-            self.playerTurn = 0        
+            return [2, 4]
 
     def removeCardFromDeck(self, i):
         self.cardsLeftInDeck.remove(i)
@@ -95,41 +125,97 @@ class Scoring:
                 raise Exception("Only the first player can post half bets")
             else:
                 cp = copy.deepcopy(self)
-                cp.advanceStage()
-                cp.totalBet += cp.betFormat[0]
                 cp.bets[playerIndex][cp.stage] = cp.betFormat[0] 
-                return cp                        
-        #add the cards!!    
+                cp.advanceStage(1)
+                cp.totalBet += cp.betFormat[0]                
+                return [cp]                        
+        
         if self.stage == 0 and action == 1:            
-            if (playerIndex != self.firstPlayer): # TO DO: give another round of betting!
+            if (playerIndex != self.firstPlayer): 
                 cp = copy.deepcopy(self)
-                cp.advanceStage()
-                cp.totalBet += cp.betFormat[1]
                 cp.bets[playerIndex][cp.stage] = cp.betFormat[1] 
-                return cp
+                cp.advanceStage(1)
+                cp.totalBet += cp.betFormat[1]                
+                return [cp]
             else:
                 raise Exception("Only the second player can post full bets")
 
         #folding
         if action == 2:
             cp = copy.deepcopy(self)
-            cp.advanceStage()            
+            cp.advanceStage(0)            
             if playerIndex == 0:
                 cp.isWin = 1
             else:
                 cp.isWin = -1
                 
-        if action == 3: # check
+        if action == 3: # check   
+            allStates = []         
+            if self.maxLastBet == 0 and self.firstPlayer != playerIndex:
+                if self.stage == 0:
+                    allPossibilities = self.giveAllPossibilities(3)
+                if self.stage > 0 and self.stage < 3:
+                    allPossibilities = self.giveAllPossibilities(1)
+                if self.stage == 3:
+                    cp = copy.deepcopy(self)
+                    cp.advanceStage(0)
+                    return [cp]                
+                for i in allPossibilities:
+                    cp = copy.deepcopy(self)                    
+                    cp.advanceStage(0)
+                    cp.communityCards += i
+                    for j in i:
+                        cp.removeCardFromDeck(j)
+                    allStates.append(cp)
+                return allStates
             cp = copy.deepcopy(self)
-            cp.advanceStage()
+            cp.advanceStage(1)
+            return [cp]
+        # A Call
+        if action == 4: #Assumption : A turn always ends with a call
+            if self.maxLastBet <= 0:
+                raise Exception("You cannot call when there has been no bets")
             
-        if action == 4: #raise
-            pass
-        
-        if action == 5: # showDown 
-            pass
-        if self.stage == self.gamelength:
-            pass #go to showdown
+            allStates = []                                             
+            if self.stage == 0:
+                allPossibilities = self.giveAllPossibilities(3)
+            if self.stage > 0 and self.stage < 3:
+                allPossibilities = self.giveAllPossibilities(1)
+            if self.stage == 3:
+                cp = copy.deepcopy(self)
+                cp.totalBet += self.maxLastBet
+                cp.bets[playerIndex][cp.stage] = self.maxLastBet                    
+                cp.advanceStage(0)                    
+                return [cp]                
+
+            for i in allPossibilities:
+                cp = copy.deepcopy(self)                    
+                cp.totalBet += self.maxLastBet
+                cp.bets[playerIndex][cp.stage] = self.maxLastBet                    
+                cp.advanceStage(0)
+                cp.communityCards += i
+                for j in i:
+                    cp.removeCardFromDeck(j)
+                allStates.append(cp)
+            return allStates                                
+
+        if action == 5: #Raise or Bet
+            allStates = []
+            if self.numberOfRaisesAllowed ==0:
+                raise Exception("Can't Raise Anymore")
+            cp = copy.deepcopy(self)
+            cp.bets[playerIndex][cp.stage] = self.betFormat[2] + self.maxLastBet
+            cp.maxLastBet += self.betFormat[2]
+            self.totalBet += self.maxLastBet
+            cp.numberOfRaisesAllowed -= 1
+            cp.advanceStage(1)
+            return [cp]
+                 
+        if action == 6: # showDown         
+            if self.stage == self.gamelength:
+                pass #go to showdown
+            else:
+                raise Exception("ShowDown has been called too early")
         
         
         
