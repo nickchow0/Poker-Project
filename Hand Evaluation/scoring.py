@@ -205,7 +205,7 @@ class Scoring:
 
         if action == 5: #Raise or Bet
             allStates = []
-            if self.numberOfRaisesAllowed ==0:
+            if self.numberOfRaisesAllowed == 0:
                 raise Exception("Can't Raise Anymore")
             cp = copy.deepcopy(self)
             cp.bets[playerIndex][cp.stage] = self.betFormat[2] + self.maxLastBet
