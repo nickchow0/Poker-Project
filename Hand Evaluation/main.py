@@ -8,9 +8,6 @@ number_of_players = 2
 bigblind = 2
 gameNumber = 0
 
-player1 = player(0, [None, None], bigblind) # self, personality, own_cards, poker, blind, dealer = 0
-player2 = player(0, [None, None], bigblind) # self, personality, own_cards, poker, dealer = 0
-
 while(True):
     gameNumber += 1
     print "Game %d" %gameNumber
@@ -44,7 +41,7 @@ while(True):
     player2.set_cards(players_hands[1])
 
     if not players_hands:
-        sys.exit("*** ERROR ***: Insufficient cards to distribute.")
+        sys.exit("*** ERROR ***: Insufficient cards to distribute. ")
 
     print "4. Hands"
     print "-----------------------"
@@ -57,8 +54,6 @@ while(True):
             text += str(card) + "  "
         print text
     print "-----------------------"
-
-
 
     #Displays the Cards
     def display_community_cards(community_cards):
@@ -113,6 +108,7 @@ while(True):
         modified_bet(0)
 
     #Flop
+    score.setStage(1)
     if score.allStillIn():
         print "5a - Flop"
         print "-----------------------"
@@ -128,6 +124,7 @@ while(True):
             bet(1,1)
 
     #Turn
+    score.setStage(2)
     if score.allStillIn():
         print "5b - Turn"
         print "-----------------------"
@@ -142,6 +139,7 @@ while(True):
             bet(1,2)
 
     #River
+    score.setStage(3)
     if score.allStillIn():
         print "5c - River"
         print "-----------------------"
@@ -155,6 +153,7 @@ while(True):
         else:
             bet(1,3)
 
+    score.setStage(4)
     if score.allStillIn():
         print "6. Determining Score"
         try:
@@ -174,7 +173,6 @@ while(True):
             len(winner)
         except:
             tie = False
-            
         if not tie:
             counter = 0
             print "-------- Winner has Been Determined --------"
